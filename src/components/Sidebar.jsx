@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
 import { useChatStore } from "../store/useChatStore";
 import SidebarSkeleton from "./skeletons/SidebarSkeleton";
-import { MessageSquare } from "lucide-react";
+import { MessageSquare, Plus } from "lucide-react";
+
 
 const Sidebar = () => {
-  const { getChats, chats, selectedChat, setSelectedChat, isChatsLoading } = useChatStore();
+  const { getChats, chats, selectedChat, setSelectedChat, isChatsLoading, createNewChat } = useChatStore();
 
   useEffect(() => {
     getChats();
@@ -19,8 +20,11 @@ const Sidebar = () => {
         <div className="flex items-center gap-2">
           <MessageSquare className="size-6" />
           <span className="font-medium hidden lg:block">Chats</span>
+          <button className="ml-auto" onClick={createNewChat}>
+            <Plus />
+          </button>
         </div>
-      </div>
+      </div> 
 
       <div className="overflow-y-auto w-full py-3">
         {chats.map((chat) => (

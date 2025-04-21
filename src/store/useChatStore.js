@@ -34,13 +34,34 @@ export const useChatStore = create((set, get) => ({
         }
       },
 
-    sendMessage: async (messageData) => {
-      const {selectedChat, messages} = get()
+    sendMessage: async (messageText) => {
+      const { selectedChat, messages } = get();
       try {
-        const res = axiosInstance.post(`/message/send/${selectedChat.chat_id}`, messageData);
-        set({messages:[...messages, res.data]})
-      } catch (error){
+        const res = await axiosInstance.post(`/message/send/${selectedChat.chat_id}`, {
+          content: messageText
+        });
+        set({ messages: [...messages, res.data] });
+      } catch (error) {
         toast.error(error.response.data.message);
+      }
+    },
+
+    sendFileMessage: async (fileData) => {
+      const {selectedChat, messages} = get();
+      try {
+        const formData = new FormData();
+        formData.append('file', fileData.file);
+        formData.append('chat_id', selectedChat.chat_id);
+
+        const res = await axiosInstance.post('/message/send-file', formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
+        });
+
+        set({messages: [...messages, res.data]});
+      } catch(error){
+        toast.error(error.response?.data?.message || "Failed to send the file");
       }
     },
 

@@ -1,15 +1,15 @@
 import { useRef, useState } from "react";
 import { useChatStore } from '../store/useChatStore';
-import { Image, Send, X } from "lucide-react";
+import { Paperclip, Send, X } from "lucide-react";
+import { axiosInstance } from "../lib/axios";
 
 const MessageInput = () => {
+
   const [text, setText] = useState("");
-  // const [filePreview, setFilePreview] = useState();
-
   const [fileData, setFileData] = useState(null);
-
   const fileInputRef = useRef(null);
-  const {sendMessage} = useChatStore();
+
+  const {sendMessage, sendFileMessage} = useChatStore();
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
@@ -34,10 +34,13 @@ const MessageInput = () => {
     if (!text.trim() && !fileData) return;
 
     try {
-      await sendMessage({
-        text: text.trim(),
-        file: fileData.preview,
-      });
+
+      if (fileData){
+        await sendFileMessage(fileData);
+      }
+      else {
+        await sendMessage(text.trim())
+      }
 
       setText("");
       setFileData(null);
@@ -99,7 +102,7 @@ const MessageInput = () => {
                      ${fileData ? "text-emerald-500" : "text-zinc-400"}`}
             onClick={() => fileInputRef.current?.click()}
           >
-            <Image size={20} />
+            <Paperclip size={20} />
           </button>
         </div>
         <button
