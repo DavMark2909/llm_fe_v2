@@ -10,12 +10,20 @@ import { Paperclip } from "lucide-react";
 
 const ChatContainer = () => {
 
-  const {messages, isMessagesLoading, getMessages, selectedChat} = useChatStore();
+  const {messages, isMessagesLoading, getMessages, selectedChat, subscribeToMessages, unsubscribeFromMessages } = useChatStore();
   const messageEndRef = useRef(null);
 
   useEffect(() => {
-    getMessages(selectedChat.chat_id)
-  }, [selectedChat.chat_id, getMessages])
+    getMessages(selectedChat.chat_id);
+    subscribeToMessages();
+    return () => unsubscribeFromMessages();  
+  }, [selectedChat.chat_id, getMessages, subscribeToMessages, unsubscribeFromMessages]);
+
+  useEffect(() => {
+    if (messageEndRef.current && messages) {
+      messageEndRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [messages]);
 
   if (isMessagesLoading) {
     return (
@@ -36,7 +44,7 @@ const ChatContainer = () => {
           <div
             key={message.id}
             className={`chat ${message.human === true ? "chat-end" : "chat-start"}`}
-            // ref={messageEndRef}
+            ref={messageEndRef}
           >
             <div className=" chat-image avatar">
               <div className="size-10 rounded-full border">

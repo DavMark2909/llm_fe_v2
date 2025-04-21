@@ -1,10 +1,11 @@
 import {create} from "zustand"
 import { axiosInstance } from "../lib/axios"
 import toast from "react-hot-toast";
+import { io } from "socket.io-client";
 
 const BASE_URL = "http://127.0.0.1:5000";
 
-export const useAuthStore = create((set) => ({
+export const useAuthStore = create((set, get) => ({
     authUser: null,
     isSigningUp: false,
     isLoggingIn: false,
@@ -14,7 +15,7 @@ export const useAuthStore = create((set) => ({
     checkAuth: async () => {
         try {
             const res = await axiosInstance.get("/auth/check") 
-            set({authUser:res.data.name})
+            // set({authUser:res.data.name})
             get().connectSocket();
         } catch (error){
             console.log("Error in CheckingAuth: ", error)
@@ -28,7 +29,7 @@ export const useAuthStore = create((set) => ({
         set({isSigningUp: true})
         try{
             const res = await axiosInstance.post("/auth/register", data)
-            set({authUser: res.data.name})
+            set({authUser: res.data})
             toast.success("Account created successfully!")
             get().connectSocket();
         } catch(error){
@@ -42,7 +43,7 @@ export const useAuthStore = create((set) => ({
         set({ isLoggingIn: true });
         try {
           const res = await axiosInstance.post("/auth/login", data);
-          set({ authUser: res.data.name });
+          set({ authUser: res.data});
           toast.success("Logged in successfully");
           get().connectSocket();
         } catch (error) {
@@ -69,7 +70,7 @@ export const useAuthStore = create((set) => ({
   
       const socket = io(BASE_URL, {
         query: {
-          userId: authUser._id,
+          userId: authUser.id,
         },
       });
       socket.connect();
