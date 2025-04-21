@@ -78,5 +78,6 @@ export const useChatStore = create((set, get) => ({
       } finally {
         set({isChatsLoading: false, isMessagesLoading: false});
       }
-    }
+    },
+
 }))
