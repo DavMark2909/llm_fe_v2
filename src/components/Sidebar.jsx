@@ -25,7 +25,7 @@ const Sidebar = () => {
       <div className="overflow-y-auto w-full py-3">
         {chats.map((chat) => (
           <button
-            key={chat.id}
+            key={chat.chat_id}
             onClick={() => setSelectedChat(chat)}
             className={`
               w-full p-3 flex items-center gap-3

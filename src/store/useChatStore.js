@@ -13,7 +13,6 @@ export const useChatStore = create((set, get) => ({
         set({isChatsLoading: true})
         try {
               const res = await axiosInstance.get('/message/load-chats');
-              console.log(res.data)
               set({ chats: res.data });
         } catch (error){
             toast.error(error.response.data.messages)
@@ -46,4 +45,17 @@ export const useChatStore = create((set, get) => ({
     },
 
     setSelectedChat: (selectedChat) => set({ selectedChat }),
+
+    createNewChat: async () => {
+      set({isChatsLoading: true, isMessagesLoading: true})
+      try {
+        const res = await axiosInstance.post('/message/chat/create');
+        get().setSelectedChat(res.data);
+        set(state => ({ chats: [...state.chats, res.data] }));
+      } catch (error) {
+        toast.error(error.response.data.message);
+      } finally {
+        set({isChatsLoading: false, isMessagesLoading: false});
+      }
+    }
 }))
