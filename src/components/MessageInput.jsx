@@ -1,15 +1,21 @@
-import { useRef, useState } from "react";
+import { useRef, useState, forwardRef, useImperativeHandle } from "react";
 import { useChatStore } from '../store/useChatStore';
 import { Paperclip, Send, X } from "lucide-react";
 import { axiosInstance } from "../lib/axios";
 
-const MessageInput = () => {
+const MessageInput = forwardRef((props, ref) => {
 
   const [text, setText] = useState("");
   const [fileData, setFileData] = useState(null);
   const fileInputRef = useRef(null);
 
   const {sendMessage, sendFileMessage} = useChatStore();
+
+  useImperativeHandle(ref, () => ({
+    triggerFilePicker: () => {
+      fileInputRef.current?.click();
+    }
+  }));
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
@@ -18,7 +24,8 @@ const MessageInput = () => {
     reader.onloadend = () => {
       setFileData({
         preview: reader.result,
-        file: file
+        file: file,
+        extension: file.name.split(".").pop().toLowerCase()
       });
     };
     reader.readAsDataURL(file);
@@ -84,10 +91,10 @@ const MessageInput = () => {
           />
           <input
             type="file"
-            accept=".db, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
+            accept=".db, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel, .csv"
             className="hidden"
             ref={fileInputRef}
-            onChange={handleFileChange}
+            onChange={handleFileChange} 
           />
           {/* <input
             type="file"
@@ -115,6 +122,6 @@ const MessageInput = () => {
       </form>
     </div>
   )
-}
+})
 
 export default MessageInput

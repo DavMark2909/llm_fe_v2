@@ -47,12 +47,23 @@ export const useChatStore = create((set, get) => ({
       }
     },
 
+    convertFiles: async () => {
+      try{
+        // should be modified in later versions in order to handle multiple users
+        const res = await axiosInstance.get('/message/convert-files');
+        set({messages: [...messages, res.data]})
+      } catch (error) {
+        toast.error(error.response.data.message);
+      }
+    },
+
     sendFileMessage: async (fileData) => {
       const {selectedChat, messages} = get();
       try {
         const formData = new FormData();
         formData.append('file', fileData.file);
         formData.append('chat_id', selectedChat.chat_id);
+        formData.append('extension', fileData.extension)
 
         const res = await axiosInstance.post('/message/send-file', formData, {
           headers: {
@@ -60,7 +71,12 @@ export const useChatStore = create((set, get) => ({
           }
         });
 
-        set({messages: [...messages, res.data]});
+        set({messages: [...messages, res.data, {
+          id: `temp-${Date.now()}`,
+          human: false,
+          type: "file_upload_decision",
+          content: "Do you want to upload another file?",
+        }]});
       } catch(error){
         toast.error(error.response?.data?.message || "Failed to send the file");
       }

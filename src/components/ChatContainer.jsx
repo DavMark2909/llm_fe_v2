@@ -12,6 +12,7 @@ const ChatContainer = () => {
 
   const {messages, isMessagesLoading, getMessages, selectedChat, subscribeToMessages, unsubscribeFromMessages } = useChatStore();
   const messageEndRef = useRef(null);
+  const messageInputRef = useRef(null)
 
   useEffect(() => {
     getMessages(selectedChat.chat_id);
@@ -30,7 +31,7 @@ const ChatContainer = () => {
       <div className="flex-1 flex flex-col overflow-auto">
         <ChatHeader />
         <MessageSkeleton />
-        <MessageInput />
+        <MessageInput ref={messageInputRef}/>
       </div>
     );
   }
@@ -57,7 +58,7 @@ const ChatContainer = () => {
                   alt="Pic"
                 />
               </div>
-            </div>
+            </div> 
             
             <div className="chat-bubble flex flex-col">
               {message.file ? (
@@ -66,14 +67,37 @@ const ChatContainer = () => {
                   {message.content && <p>{message.content}</p>}
                 </div>
               ) : (
-                message.content && <p>{message.content}</p>
+                <>
+                {message.content && <p>{message.content}</p>}
+                {message.type === "file_upload_decision" && (
+                  <div className="mt-2 flex gap-2">
+                    <button
+                      className="btn btn-xs btn-primary"
+                      onClick={() => {
+                        // Trigger file input
+                        messageInputRef.current?.triggerFilePicker();
+                      }}
+                    >
+                      Yes
+                    </button>
+                    <button
+                      className="btn btn-xs btn-secondary"
+                      onClick={() => {
+                        // TODO: implement this
+                      }}
+                    >
+                      No
+                    </button>
+                  </div>
+                )}
+                </>
               )}
             </div>
           </div>
         ))}
       </div>
 
-      <MessageInput />
+      <MessageInput ref={messageInputRef}/>
     </div>
   );
   
