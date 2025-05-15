@@ -10,7 +10,7 @@ import { Paperclip } from "lucide-react";
 
 const ChatContainer = () => {
 
-  const {messages, isMessagesLoading, getMessages, selectedChat, subscribeToMessages, unsubscribeFromMessages } = useChatStore();
+  const {messages, isMessagesLoading, getMessages, selectedChat, subscribeToMessages, unsubscribeFromMessages, convertFiles, isTableCreating } = useChatStore();
   const messageEndRef = useRef(null);
   const messageInputRef = useRef(null)
 
@@ -74,7 +74,6 @@ const ChatContainer = () => {
                     <button
                       className="btn btn-xs btn-primary"
                       onClick={() => {
-                        // Trigger file input
                         messageInputRef.current?.triggerFilePicker();
                       }}
                     >
@@ -83,7 +82,7 @@ const ChatContainer = () => {
                     <button
                       className="btn btn-xs btn-secondary"
                       onClick={() => {
-                        // TODO: implement this
+                        convertFiles()
                       }}
                     >
                       No
@@ -95,6 +94,13 @@ const ChatContainer = () => {
             </div>
           </div>
         ))}
+        {isTableCreating && (
+          <div className="chat chat-start">
+            <div className="chat-bubble bg-base-200">
+              <span className="loading loading-spinner loading-md"></span>
+            </div>
+        </div>
+        )}
       </div>
 
       <MessageInput ref={messageInputRef}/>

@@ -10,6 +10,8 @@ export const useChatStore = create((set, get) => ({
     isChatsLoading: false,
     isMessagesLoading: false,
 
+    isTableCreating: false,
+
     getChats: async () => {
         set({isChatsLoading: true})
         try {
@@ -48,12 +50,26 @@ export const useChatStore = create((set, get) => ({
     },
 
     convertFiles: async () => {
+      set({isTableCreating: true})
+      const {messages} = get();
       try{
-        // should be modified in later versions in order to handle multiple users
-        const res = await axiosInstance.get('/message/convert-files');
-        set({messages: [...messages, res.data]})
+        if (res.status === 200) {
+          set({messages: [...messages, res.data,
+              {
+                id: `temp-${Date.now()}`,
+                human: false,
+                type: "star_schema",
+                content: "Would you like to generate a star schema?",
+              }
+            ]
+          });
+        } else {
+          set({ messages: [...messages, res.data] });
+        }
       } catch (error) {
         toast.error(error.response.data.message);
+      } finally {
+        set({isTableCreating: false})
       }
     },
 
