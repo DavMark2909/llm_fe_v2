@@ -2,6 +2,7 @@ import {create} from "zustand"
 import { axiosInstance } from "../lib/axios"
 import toast from "react-hot-toast";
 import { useAuthStore } from "./useAuthStore";
+import qs from 'qs'
 
 export const useChatStore = create((set, get) => ({
     messages: [],
@@ -65,8 +66,26 @@ export const useChatStore = create((set, get) => ({
     },
 
     sendForFactTable: async (agg_columns, operations, time_column, time) => {
-      console.log("pressed the proceed button")
-      console.log(time_column, time)
+      console.log(agg_columns, operations, time_column, time)
+      set({isTableCreating: true})
+      const {selectedChat} = get();
+      try {
+        const res = await axiosInstance.get(`/message/star-schema/${selectedChat.chat_id}`, {
+          params: {
+            agg_columns,         
+            operations: JSON.stringify(operations),        
+            time_column,    
+            time,  
+          },
+          paramsSerializer: (params) =>
+            qs.stringify(params, { arrayFormat: 'repeat' })
+        });
+
+      } catch (error){
+        toast.error(error.response.data.message);
+      } finally {
+        set({isTableCreating: false})
+      }
 
     },
 

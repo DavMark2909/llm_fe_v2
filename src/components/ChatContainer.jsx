@@ -256,7 +256,7 @@ const ChatContainer = () => {
                   }))}
                 disabled={selectedColumns.length === 0 && selectedTable}
               >
-                Proceed
+                {(selectedColumns.length > 0 && selectedTable===null) ? "Choose operations" : (selectedTable===null && Object.keys(selectedOperations).length !== 0) ? "Generate fact table" : "Proceed"}
               </button>
             </div>
           </div>
