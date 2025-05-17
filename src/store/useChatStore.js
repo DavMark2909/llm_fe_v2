@@ -11,6 +11,7 @@ export const useChatStore = create((set, get) => ({
     isMessagesLoading: false,
 
     isTableCreating: false,
+    itemSelection: null,
 
     getChats: async () => {
         set({isChatsLoading: true})
@@ -49,10 +50,35 @@ export const useChatStore = create((set, get) => ({
       }
     },
 
+    generateStarSchema: async () => {
+      set({isTableCreating: true})
+      const {selectedChat, itemSelection} = get();
+      try {
+        const res = await axiosInstance.get(`/message/generate-star-schema/${selectedChat.chat_id}`)
+        set({itemSelection: res.data.content})
+
+      } catch (error){
+        toast.error(error.response.data.message);
+      } finally {
+        set({isTableCreating: false})
+      }
+    },
+
+    sendForFactTable: async (agg_columns, operations, time_column, time) => {
+      console.log("pressed the proceed button")
+      console.log(time_column, time)
+
+    },
+
+    addAcknoledgmentMessage: async (type) => {
+
+    },
+
     convertFiles: async () => {
       set({isTableCreating: true})
       const {messages} = get();
       try{
+        const res = await axiosInstance.get('/message/convert-files');
         if (res.status === 200) {
           set({messages: [...messages, res.data,
               {
